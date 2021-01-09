@@ -89,6 +89,10 @@ class CustomReward(Wrapper):
         frame3 = cv2.resize(frame2, (84, 84))
         file_str = dir_path_str + '/pic/resize/' + 'IMG_' + str(self.counter) + '.png'
         cv2.imwrite(file_str, frame3)
+        # 0-255 
+        #print(frame3)
+        # 0-1.0
+        # print(frame3/255)
         #
         self.counter = self.counter + 1
         state = process_frame(state)

@@ -11,7 +11,7 @@ import torch
 from src.env import create_train_env
 from src.model import ActorCritic
 import torch.nn.functional as F
-
+from gym_super_mario_bros.actions import SIMPLE_MOVEMENT, COMPLEX_MOVEMENT, RIGHT_ONLY
 
 def get_args():
     parser = argparse.ArgumentParser(
@@ -56,7 +56,7 @@ def test(opt):
         policy = F.softmax(logits, dim=1)
         action = torch.argmax(policy).item()
         action = int(action)
-        print('{0:02}'.format(action) + ':' + '{0:08b}'.format(action))
+        print('{0:02}'.format(action) + ':' + '{0:08b}'.format(action) + ':' + str(COMPLEX_MOVEMENT[action]))
         state, reward, done, info = env.step(action)
         state = torch.from_numpy(state)
         env.render()

@@ -6,6 +6,8 @@ CONST_NES_RES_WIDTH = 256
 CONST_NES_RES_HEIGHT = 240
 CONST_OFFSET_RES_WIDTH = (20, 476)
 CONST_OFFSET_RES_HEIGHT = (128, 512)
+CONST_FEATURE_RES_WIDTH = 84
+CONST_FEATURE_RES_HEIGHT = 84
 
 print(f'Capture Resolution: {(CONST_CAP_RES_WIDTH, CONST_CAP_RES_HEIGHT)}')
 print(f'NES Resolution: {(CONST_NES_RES_WIDTH, CONST_NES_RES_HEIGHT)}')
@@ -31,8 +33,10 @@ while(True):
    frame_3 = cv2.resize(frame_2, (CONST_NES_RES_WIDTH, CONST_NES_RES_HEIGHT))
    #
    frame_4 = cv2.cvtColor(frame_3, cv2.COLOR_RGB2GRAY)
+   #
+   frame_5 = cv2.resize(frame_4, (CONST_FEATURE_RES_WIDTH, CONST_FEATURE_RES_HEIGHT))
    # Display the resulting frame
-   cv2.imshow('preview', frame_4)
+   cv2.imshow('preview', frame_5)
    #Waits for a user input to quit the application
    if cv2.waitKey(1) & 0xFF == ord('q'):
       break

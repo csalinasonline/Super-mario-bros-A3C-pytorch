@@ -29,9 +29,10 @@ while(True):
    frame_2 = frame[20:476, 128:512]
    #
    frame_3 = cv2.resize(frame_2, (CONST_NES_RES_WIDTH, CONST_NES_RES_HEIGHT))
+   #
+   frame_4 = cv2.cvtColor(frame_3, cv2.COLOR_RGB2GRAY)
    # Display the resulting frame
-   cv2.imshow('preview', frame_3)
-
+   cv2.imshow('preview', frame_4)
    #Waits for a user input to quit the application
    if cv2.waitKey(1) & 0xFF == ord('q'):
       break

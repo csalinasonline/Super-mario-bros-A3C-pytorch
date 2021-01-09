@@ -3,6 +3,7 @@
 """
 
 import os
+import time
 
 os.environ['OMP_NUM_THREADS'] = '1'
 import argparse
@@ -59,6 +60,7 @@ def test(opt):
         state, reward, done, info = env.step(action)
         state = torch.from_numpy(state)
         env.render()
+        time.sleep(1)
         if info["flag_get"]:
             print("World {} stage {} completed".format(opt.world, opt.stage))
             break

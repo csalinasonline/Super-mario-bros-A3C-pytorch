@@ -94,6 +94,10 @@ class CustomReward(Wrapper):
         # 0-1.0
         # print(frame3/255)
         #
+        #print(info)
+        #print(done)
+        #print(reward)
+        #
         self.counter = self.counter + 1
         state = process_frame(state)
         reward += (info["score"] - self.curr_score) / 40.

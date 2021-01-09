@@ -1,3 +1,7 @@
+
+
+
+
 """
 @author: Viet Nguyen <nhviet1009@gmail.com>
 """
@@ -8,6 +12,7 @@ from gym import Wrapper
 from nes_py.wrappers import JoypadSpace
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT, COMPLEX_MOVEMENT, RIGHT_ONLY
 import cv2
+import os
 import numpy as np
 import subprocess as sp
 
@@ -21,6 +26,26 @@ class Monitor:
             self.pipe = sp.Popen(self.command, stdin=sp.PIPE, stderr=sp.PIPE)
         except FileNotFoundError:
             pass
+        dir_path_str = os.getcwd()
+        try:
+            os.mkdir(dir_path_str + '/pic')
+        except:
+            pass
+
+        try:
+            os.mkdir(dir_path_str + '/pic/ori')
+        except:
+            pass
+
+        try:
+            os.mkdir(dir_path_str + '/pic/gray')
+        except:
+            pass
+
+        try:
+            os.mkdir(dir_path_str + '/pic/resize')
+        except:
+            pass
 
     def record(self, image_array):
         self.pipe.stdin.write(image_array.tostring())
@@ -29,7 +54,9 @@ class Monitor:
 def process_frame(frame):
     if frame is not None:
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+        #print(frame.shape)
         frame = cv2.resize(frame, (84, 84))[None, :, :] / 255.
+        #print(frame.shape)
         return frame
     else:
         return np.zeros((1, 84, 84))
@@ -39,6 +66,7 @@ class CustomReward(Wrapper):
     def __init__(self, env=None, monitor=None):
         super(CustomReward, self).__init__(env)
         self.observation_space = Box(low=0, high=255, shape=(1, 84, 84))
+        self.counter = 0
         self.curr_score = 0
         if monitor:
             self.monitor = monitor
@@ -49,6 +77,20 @@ class CustomReward(Wrapper):
         state, reward, done, info = self.env.step(action)
         if self.monitor:
             self.monitor.record(state)
+        #
+        dir_path_str = os.getcwd()
+        file_str = dir_path_str + '/pic/ori/' + 'IMG_' + str(self.counter) + '.png'
+        cv2.imwrite(file_str, state)
+        #
+        frame2 = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
+        file_str = dir_path_str + '/pic/gray/' + 'IMG_' + str(self.counter) + '.png'
+        cv2.imwrite(file_str, frame2)
+        #
+        frame3 = cv2.resize(frame2, (84, 84))
+        file_str = dir_path_str + '/pic/resize/' + 'IMG_' + str(self.counter) + '.png'
+        cv2.imwrite(file_str, frame3)
+        #
+        self.counter = self.counter + 1
         state = process_frame(state)
         reward += (info["score"] - self.curr_score) / 40.
         self.curr_score = info["score"]

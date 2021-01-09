@@ -16,22 +16,24 @@
 
   Notes:
   NES Controller action mapping
-  [['NOOP'], 
-  ['right'], 
-  ['right', 'A'], 
-  ['right', 'B'], 
-  ['right', 'A', 'B'], 
-  ['A'], ['left'], 
-  ['left', 'A'], 
-  ['left', 'B'], 
-  ['left', 'A', 'B'], 
-  ['down'], ['up']]
+  1 [['NOOP'], 
+  2 ['right'], 
+  3 ['right', 'A'], 
+  4 ['right', 'B'], 
+  5 ['right', 'A', 'B'], 
+  6 ['A'], 
+  7 ['left'], 
+  8 ['left', 'A'], 
+  9 ['left', 'B'], 
+  10 ['left', 'A', 'B'], 
+  11 ['down'], 
+  12 ['up']]
   NES Controller action mapping misc
-  [['start'],
-  ['select']]
+  13 [['start'],
+  14 ['select']]
   NES Classic IO mapping
-  [['power'],
-  ['reset']
+  15 [['power'],
+  16 ['reset']
 */
 
 /* DEFINES */

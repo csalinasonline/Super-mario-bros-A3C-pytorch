@@ -14,6 +14,8 @@
   This example code is in the public domain.
   http://www.arduino.cc/en/Tutorial/SerialEvent
 
+  Board: Arduino BLE 33 Sense
+
   Notes:
   NES Controller action mapping
   1 [['NOOP'], 
@@ -37,16 +39,16 @@
 */
 
 /* DEFINES */
-#define NES_CTRL_UP       13
-#define NES_CTRL_DOWN     12
-#define NES_CTRL_LEFT     11
-#define NES_CTRL_RIGHT    10
-#define NES_CTRL_A        9
-#define NES_CTRL_B        8
-#define NES_CTRL_START    7
-#define NES_CTRL_SELECT   6
-#define NES_IO_POWER      5
-#define NES_IO_RESET      4
+#define NES_CTRL_UP       12
+#define NES_CTRL_DOWN     11
+#define NES_CTRL_LEFT     10
+#define NES_CTRL_RIGHT    9
+#define NES_CTRL_A        8
+#define NES_CTRL_B        7
+#define NES_CTRL_START    6
+#define NES_CTRL_SELECT   5
+#define NES_IO_POWER      4
+#define NES_IO_RESET      3
 
 #define ACTION_1          1
 #define ACTION_2          2
@@ -65,8 +67,8 @@
 #define ACTION_15         15
 #define ACTION_16         16
 
-#define BUTTON_ENABLE     HIGH 
-#define BUTTON_DISABLE    LOW   
+#define BUTTON_ENABLE     LOW 
+#define BUTTON_DISABLE    HIGH   
 
 /* GLOBALS */
 String inputString = "";         // a String to hold incoming data
@@ -75,6 +77,7 @@ bool stringComplete = false;  // whether the string is complete
 /* PROTOTYPES */
 void serialEvent(void);
 void action_output(int);
+void action_clear(int);
 
 /* INIT */
 void setup() {
@@ -83,7 +86,6 @@ void setup() {
   // reserve 200 bytes for the inputString:
   inputString.reserve(200);
   // init IO
-  pinMode(13, OUTPUT);
   pinMode(12, OUTPUT);
   pinMode(11, OUTPUT);
   pinMode(10, OUTPUT);
@@ -93,109 +95,250 @@ void setup() {
   pinMode(6, OUTPUT);
   pinMode(5, OUTPUT);
   pinMode(4, OUTPUT);
-  digitalWrite(13, BUTTON_DISABLE);
+  pinMode(3, OUTPUT);  
   digitalWrite(12, BUTTON_DISABLE);
   digitalWrite(11, BUTTON_DISABLE);
   digitalWrite(10, BUTTON_DISABLE);
   digitalWrite(9, BUTTON_DISABLE);
-  digitalWrite(8, BUTTON_DISABLE);
+  digitalWrite(8, BUTTON_DISABLE); 
   digitalWrite(7, BUTTON_DISABLE);
   digitalWrite(6, BUTTON_DISABLE);
   digitalWrite(5, BUTTON_DISABLE);
   digitalWrite(4, BUTTON_DISABLE);
+  digitalWrite(3, BUTTON_DISABLE);
 }
 
 /* LOOP */
 void loop() {
-  // print the string when a newline arrives:
-  if (stringComplete) {
-    Serial.println(inputString);
-    //
-    int action = inputString.toInt();
-    switch(action) {
-      case ACTION_1: // ['NOOP']
-        break;
-      case ACTION_2: // ['right']
-        action_output(NES_CTRL_RIGHT);
-        break; 
-      case ACTION_3: // ['right', 'A']
-        action_output(NES_CTRL_RIGHT);
-        action_output(NES_CTRL_A);
-        break;  
-      case ACTION_4: // ['right', 'B']
-        action_output(NES_CTRL_RIGHT);
-        action_output(NES_CTRL_B);
-        break; 
-      case ACTION_5: // ['right', 'A', 'B']
-        action_output(NES_CTRL_RIGHT);
-        action_output(NES_CTRL_A);
-        action_output(NES_CTRL_B);
-        break; 
-      case ACTION_6: // ['A']
-        action_output(NES_CTRL_A);
-        break; 
-      case ACTION_7: // ['left']
-        action_output(NES_CTRL_LEFT);
-        break; 
-      case ACTION_8: // ['left', 'A']
-        action_output(NES_CTRL_LEFT);
-        action_output(NES_CTRL_A);
-        break; 
-      case ACTION_9: // ['left', 'B']
-        action_output(NES_CTRL_LEFT);
-        action_output(NES_CTRL_B);
-        break; 
-      case ACTION_10: // ['left', 'A', 'B']
-        action_output(NES_CTRL_LEFT);
-        action_output(NES_CTRL_A);
-        action_output(NES_CTRL_B);
-        break; 
-      case ACTION_11: // ['down']
-        action_output(NES_CTRL_DOWN);
-        break; 
-      case ACTION_12: // ['up']
-        action_output(NES_CTRL_UP);
-        break; 
-      case ACTION_13: // ['start']
-        action_output(NES_CTRL_START);
-        break; 
-      case ACTION_14: // ['select']
-        action_output(NES_CTRL_SELECT);
-        break; 
-      case ACTION_15: // ['power']
-        action_output(NES_IO_POWER);
-        break; 
-      case ACTION_16: // ['reset']
-        action_output(NES_IO_RESET);
-        break;                                                                                                                      
-      default:
-        break;
+  while (Serial.available()) {
+    // get the new byte:
+    char inChar = (char)Serial.read();
+    // got new line so complete string
+    if (inChar == '\n') {
+      stringComplete = true;
     }
-    // clear the string:
-    inputString = "";
-    stringComplete = false;
+    else {
+      // add it to the inputString:
+      inputString += inChar;      
+    }
+    // string is complete so execute actions
+    if(stringComplete) {
+      // Serial.println(inputString);
+      int action = inputString.toInt();
+      switch(action) {
+        case ACTION_1: // ['NOOP']
+          action_clear(NES_CTRL_UP);
+          action_clear(NES_CTRL_DOWN);
+          action_clear(NES_CTRL_LEFT);
+          action_clear(NES_CTRL_RIGHT);
+          action_clear(NES_CTRL_A);
+          action_clear(NES_CTRL_B);
+          action_clear(NES_CTRL_START);
+          action_clear(NES_CTRL_SELECT);
+          action_clear(NES_IO_POWER);
+          action_clear(NES_IO_RESET);                                        
+          break;
+        case ACTION_2: // ['right']
+          action_clear(NES_CTRL_UP);
+          action_clear(NES_CTRL_DOWN);
+          action_clear(NES_CTRL_LEFT);
+          action_output(NES_CTRL_RIGHT);
+          action_clear(NES_CTRL_A);
+          action_clear(NES_CTRL_B);
+          action_clear(NES_CTRL_START);
+          action_clear(NES_CTRL_SELECT);
+          action_clear(NES_IO_POWER);
+          action_clear(NES_IO_RESET);                                        
+          break;
+        case ACTION_3: // ['right', 'A']
+          action_clear(NES_CTRL_UP);
+          action_clear(NES_CTRL_DOWN);
+          action_clear(NES_CTRL_LEFT);
+          action_output(NES_CTRL_RIGHT);
+          action_output(NES_CTRL_A);
+          action_clear(NES_CTRL_B);
+          action_clear(NES_CTRL_START);
+          action_clear(NES_CTRL_SELECT);
+          action_clear(NES_IO_POWER);
+          action_clear(NES_IO_RESET);                                        
+          break;  
+        case ACTION_4: // ['right', 'B']
+          action_clear(NES_CTRL_UP);
+          action_clear(NES_CTRL_DOWN);
+          action_clear(NES_CTRL_LEFT);
+          action_output(NES_CTRL_RIGHT);
+          action_clear(NES_CTRL_A);
+          action_output(NES_CTRL_B);
+          action_clear(NES_CTRL_START);
+          action_clear(NES_CTRL_SELECT);
+          action_clear(NES_IO_POWER);
+          action_clear(NES_IO_RESET);                                        
+          break;
+        case ACTION_5: // ['right', 'A', 'B']
+          action_clear(NES_CTRL_UP);
+          action_clear(NES_CTRL_DOWN);
+          action_clear(NES_CTRL_LEFT);
+          action_output(NES_CTRL_RIGHT);
+          action_output(NES_CTRL_A);
+          action_output(NES_CTRL_B);
+          action_clear(NES_CTRL_START);
+          action_clear(NES_CTRL_SELECT);
+          action_clear(NES_IO_POWER);
+          action_clear(NES_IO_RESET);                                        
+          break; 
+        case ACTION_6: // ['A']
+          action_clear(NES_CTRL_UP);
+          action_clear(NES_CTRL_DOWN);
+          action_clear(NES_CTRL_LEFT);
+          action_clear(NES_CTRL_RIGHT);
+          action_output(NES_CTRL_A);
+          action_clear(NES_CTRL_B);
+          action_clear(NES_CTRL_START);
+          action_clear(NES_CTRL_SELECT);
+          action_clear(NES_IO_POWER);
+          action_clear(NES_IO_RESET);                                        
+          break;
+        case ACTION_7: // ['left']
+          action_clear(NES_CTRL_UP);
+          action_clear(NES_CTRL_DOWN);
+          action_output(NES_CTRL_LEFT);
+          action_clear(NES_CTRL_RIGHT);
+          action_clear(NES_CTRL_A);
+          action_clear(NES_CTRL_B);
+          action_clear(NES_CTRL_START);
+          action_clear(NES_CTRL_SELECT);
+          action_clear(NES_IO_POWER);
+          action_clear(NES_IO_RESET);                                        
+          break;
+        case ACTION_8: // ['left', 'A']
+          action_clear(NES_CTRL_UP);
+          action_clear(NES_CTRL_DOWN);
+          action_output(NES_CTRL_LEFT);
+          action_clear(NES_CTRL_RIGHT);
+          action_output(NES_CTRL_A);
+          action_clear(NES_CTRL_B);
+          action_clear(NES_CTRL_START);
+          action_clear(NES_CTRL_SELECT);
+          action_clear(NES_IO_POWER);
+          action_clear(NES_IO_RESET);                                        
+          break;
+        case ACTION_9: // ['left', 'B']
+          action_clear(NES_CTRL_UP);
+          action_clear(NES_CTRL_DOWN);
+          action_output(NES_CTRL_LEFT);
+          action_clear(NES_CTRL_RIGHT);
+          action_clear(NES_CTRL_A);
+          action_output(NES_CTRL_B);
+          action_clear(NES_CTRL_START);
+          action_clear(NES_CTRL_SELECT);
+          action_clear(NES_IO_POWER);
+          action_clear(NES_IO_RESET);                                        
+          break;
+        case ACTION_10: // ['left', 'A', 'B']
+          action_clear(NES_CTRL_UP);
+          action_clear(NES_CTRL_DOWN);
+          action_output(NES_CTRL_LEFT);
+          action_clear(NES_CTRL_RIGHT);
+          action_output(NES_CTRL_A);
+          action_output(NES_CTRL_B);
+          action_clear(NES_CTRL_START);
+          action_clear(NES_CTRL_SELECT);
+          action_clear(NES_IO_POWER);
+          action_clear(NES_IO_RESET);                                        
+          break; 
+        case ACTION_11: // ['down']
+          action_clear(NES_CTRL_UP);
+          action_output(NES_CTRL_DOWN);
+          action_clear(NES_CTRL_LEFT);
+          action_clear(NES_CTRL_RIGHT);
+          action_clear(NES_CTRL_A);
+          action_clear(NES_CTRL_B);
+          action_clear(NES_CTRL_START);
+          action_clear(NES_CTRL_SELECT);
+          action_clear(NES_IO_POWER);
+          action_clear(NES_IO_RESET);                                        
+          break; 
+        case ACTION_12: // ['up']
+          action_output(NES_CTRL_UP);
+          action_clear(NES_CTRL_DOWN);
+          action_clear(NES_CTRL_LEFT);
+          action_clear(NES_CTRL_RIGHT);
+          action_clear(NES_CTRL_A);
+          action_clear(NES_CTRL_B);
+          action_clear(NES_CTRL_START);
+          action_clear(NES_CTRL_SELECT);
+          action_clear(NES_IO_POWER);
+          action_clear(NES_IO_RESET);                                        
+          break; 
+        case ACTION_13: // ['start']
+          action_clear(NES_CTRL_UP);
+          action_clear(NES_CTRL_DOWN);
+          action_clear(NES_CTRL_LEFT);
+          action_clear(NES_CTRL_RIGHT);
+          action_clear(NES_CTRL_A);
+          action_clear(NES_CTRL_B);
+          action_output(NES_CTRL_START);
+          action_clear(NES_CTRL_SELECT);
+          action_clear(NES_IO_POWER);
+          action_clear(NES_IO_RESET);                                        
+          break;
+        case ACTION_14: // ['select']
+          action_clear(NES_CTRL_UP);
+          action_clear(NES_CTRL_DOWN);
+          action_clear(NES_CTRL_LEFT);
+          action_clear(NES_CTRL_RIGHT);
+          action_clear(NES_CTRL_A);
+          action_clear(NES_CTRL_B);
+          action_clear(NES_CTRL_START);
+          action_output(NES_CTRL_SELECT);
+          action_clear(NES_IO_POWER);
+          action_clear(NES_IO_RESET);                                        
+          break;
+        case ACTION_15: // ['power']
+          action_clear(NES_CTRL_UP);
+          action_clear(NES_CTRL_DOWN);
+          action_clear(NES_CTRL_LEFT);
+          action_clear(NES_CTRL_RIGHT);
+          action_clear(NES_CTRL_A);
+          action_clear(NES_CTRL_B);
+          action_clear(NES_CTRL_START);
+          action_clear(NES_CTRL_SELECT);
+          action_output(NES_IO_POWER);
+          action_clear(NES_IO_RESET);                                        
+          break; 
+        case ACTION_16: // ['reset']
+          action_clear(NES_CTRL_UP);
+          action_clear(NES_CTRL_DOWN);
+          action_clear(NES_CTRL_LEFT);
+          action_clear(NES_CTRL_RIGHT);
+          action_clear(NES_CTRL_A);
+          action_clear(NES_CTRL_B);
+          action_clear(NES_CTRL_START);
+          action_clear(NES_CTRL_SELECT);
+          action_clear(NES_IO_POWER);
+          action_output(NES_IO_RESET);                                        
+          break;                                                                                                                     
+        default:
+          action_clear(NES_CTRL_UP);
+          action_clear(NES_CTRL_DOWN);
+          action_clear(NES_CTRL_LEFT);
+          action_clear(NES_CTRL_RIGHT);
+          action_clear(NES_CTRL_A);
+          action_clear(NES_CTRL_B);
+          action_clear(NES_CTRL_START);
+          action_clear(NES_CTRL_SELECT);
+          action_clear(NES_IO_POWER);
+          action_clear(NES_IO_RESET);                                        
+          break;
+      }
+      // clear the string:
+      inputString = "";
+      stringComplete = false;
+    }
   }
 }
 
 /* FUNCTIONS */
-/*
-  SerialEvent occurs whenever a new data comes in the hardware serial RX. This
-  routine is run between each time loop() runs, so using delay inside loop can
-  delay response. Multiple bytes of data may be available.
-*/
-void serialEvent() {
-  while (Serial.available()) {
-    // get the new byte:
-    char inChar = (char)Serial.read();
-    // add it to the inputString:
-    inputString += inChar;
-    // if the incoming character is a newline, set a flag so the main loop can
-    // do something about it:
-    if (inChar == '\n') {
-      stringComplete = true;
-    }
-  }
-}
 
 //
 void action_output(int pin) {
@@ -203,6 +346,16 @@ void action_output(int pin) {
     digitalWrite(pin, HIGH);
   }
   else {
+    digitalWrite(pin, LOW);   
+  }
+}
+
+//
+void action_clear(int pin) {
+  if(BUTTON_ENABLE) {
     digitalWrite(pin, LOW);
+  }
+  else {
+    digitalWrite(pin, HIGH);   
   }
 }

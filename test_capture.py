@@ -37,6 +37,50 @@ def convert_state_to_img(input_state):
     #print(state_3.shape)
     cv2.imshow('Input State to Img', np.array(state_4, dtype = np.uint8 ))
 
+# method that reads the score from capture
+def read_score():
+    pass
+
+# method that reads the coins from capture
+def read_coins():
+    pass
+
+# method that reads the times from capture
+def read_time():
+    pass
+
+# method that reads the world from capture
+def read_world():
+    pass
+
+# method that reports flag goal from capture
+def is_flag_goal():
+    pass
+
+# method that reports mario died from capture
+def is_mario_dead():
+    pass
+
+# method that reports mario size from capture
+def is_mario_size():
+    pass
+
+# method that reports mario power up type from capture
+def is_mario_power_up():
+    pass
+
+# method that reports game over from capture
+def is_game_over():
+    pass
+
+# methond go to main menu
+def goto_main_menu():
+    pass
+
+# method to start lvl 1_1
+def goto_lvl_1_1():
+    pass
+
 #
 def test(opt):
     # setup serial

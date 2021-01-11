@@ -89,6 +89,15 @@ def capture_state():
 def reduce_state():
     pass
 
+# method capture reset
+def capture_reset():
+    goto_main_menu()
+    goto_lvl_1_1()
+
+# method capture step
+def capture_step():
+    return 0, 0, 0, 0
+
 #
 def test(opt):
     # setup serial
@@ -137,6 +146,13 @@ def test(opt):
     # get inital state from start of Mario Stage via Image
     state = torch.from_numpy(env.reset())
     convert_state_to_img(state)
+    # MODIFIED
+    capture_reset()
+    #state = capture_state()
+    #state = reduce_state()
+    #state = torch.from_numpy(state)
+    #convert_state_to_img(state)
+
     done = True
 
     # loop
@@ -171,20 +187,27 @@ def test(opt):
         state, reward, done, info = env.step(action)
         # numpy to tensor
         state = torch.from_numpy(state)
+        # MODIFIED
+        #state, reward, done, info = capture_step()
+        #state = torch.from_numpy(state)
 
         # show state as img
         convert_state_to_img(state)
 
         # show game
         env.render()
-
         # give some delay
         time.sleep(1)
+        # MODIFIED
 
         # finsihed level
         if info["flag_get"]:
             #print("World {} stage {} completed".format(opt.world, opt.stage))
             break
+        # MODIFIED
+        #f_goal = is_flag_goal()
+        #if f_goal:
+        #    break
 
         # cv2 waits for a user input to quit the application
         if cv2.waitKey(1) & 0xFF == ord('q'):

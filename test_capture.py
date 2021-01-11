@@ -147,6 +147,7 @@ def test(opt):
     state = torch.from_numpy(env.reset())
     convert_state_to_img(state)
     # MODIFIED
+    ser.write('\n'.encode('utf_8'))
     capture_reset()
     #state = capture_state()
     #state = reduce_state()
@@ -213,6 +214,8 @@ def test(opt):
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
+    # clear nes ctrl
+    ser.write('\n'.encode('utf_8'))
     # close serial
     ser.close()
     # close cv2

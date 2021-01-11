@@ -308,15 +308,18 @@ void loop() {
           break; 
         case ACTION_16: // ['reset']
           action_clear(NES_CTRL_UP);
-          action_clear(NES_CTRL_DOWN);
+          action_output(NES_CTRL_DOWN);
           action_clear(NES_CTRL_LEFT);
           action_clear(NES_CTRL_RIGHT);
           action_clear(NES_CTRL_A);
           action_clear(NES_CTRL_B);
           action_clear(NES_CTRL_START);
-          action_clear(NES_CTRL_SELECT);
+          action_output(NES_CTRL_SELECT);
           action_clear(NES_IO_POWER);
           action_output(NES_IO_RESET);                                        
+          delay(2000);    
+          action_clear(NES_CTRL_START);
+          action_clear(NES_CTRL_SELECT);                                           
           break;                                                                                                                     
         default:
           action_clear(NES_CTRL_UP);

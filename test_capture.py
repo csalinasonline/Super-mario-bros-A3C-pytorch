@@ -2,6 +2,7 @@
 @author: Conrad Salinas <csalinasonline@gmail.com>
 """
 
+import cv2
 import os
 import time
 import serial
@@ -25,6 +26,25 @@ def get_args():
     args = parser.parse_args()
     return args
 
+def convert_state_to_img(input_state):
+    print(input_state.shape)
+    state_2 = np.squeeze(input_state)
+    print(state_2.shape)
+    state_3 = state_2[1,:,:]
+    print(state_3.shape)
+    state_4 = np.array(state_3)
+    print(state_4.shape)
+    time.sleep(2)
+    print(state_4)
+    time.sleep(2)
+    state_5 = state_4 * 255.
+    print(state_5)
+    time.sleep(2)
+    state_6 = cv2.cvtColor(state_5, cv2.COLOR_GRAY2RGB)
+    print(state_6.shape)
+    time.sleep(2)
+    cv2.imshow('Start Img',state_6)
+    time.sleep(2)
 
 def test(opt):
     # setup serial
@@ -42,14 +62,14 @@ def test(opt):
       time.sleep(1)
       ser.open()
       time.sleep(1)
-    #ser.close()
+
     # seed
     torch.manual_seed(123)
     # setup env
     env, num_states, num_actions = create_train_env(opt.world, opt.stage, opt.action_type,
                                                     "{}/video_{}_{}.mp4".format(opt.output_path, opt.world, opt.stage)) 
     #
-    print(opt)   
+    print(opt)
     # constants
     num_states = 4
     num_actions = 12
@@ -66,8 +86,7 @@ def test(opt):
     model.eval()
     # get inital state from start of Mario Stage via Image
     state = torch.from_numpy(env.reset())
-    print(state.shape)
-    time.sleep(2)
+    convert_state_to_img(state)
     done = True
 
     # loop

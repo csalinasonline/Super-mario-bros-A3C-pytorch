@@ -117,9 +117,10 @@ def test(opt):
 
         # update state
         state, reward, done, info = env.step(action)
+        # numpy to tensor
         state = torch.from_numpy(state)
 
-        # numpy to tensor
+        # show state as img
         convert_state_to_img(state)
 
         # show game

@@ -53,7 +53,7 @@ class Monitor:
 
 def process_frame(frame):
     if frame is not None:
-        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         #print(frame.shape)
         frame = cv2.resize(frame, (84, 84))[None, :, :] / 255.
         #print(frame.shape)
@@ -78,11 +78,13 @@ class CustomReward(Wrapper):
         if self.monitor:
             self.monitor.record(state)
         #
+        frame = cv2.cvtColor(state, cv2.COLOR_BGR2RGB)
+        #
         dir_path_str = os.getcwd()
         file_str = dir_path_str + '/pic/ori/' + 'IMG_' + str(self.counter) + '.png'
-        cv2.imwrite(file_str, state)
+        cv2.imwrite(file_str, frame)
         #
-        frame2 = cv2.cvtColor(state, cv2.COLOR_RGB2GRAY)
+        frame2 = cv2.cvtColor(state, cv2.COLOR_BGR2GRAY)
         file_str = dir_path_str + '/pic/gray/' + 'IMG_' + str(self.counter) + '.png'
         cv2.imwrite(file_str, frame2)
         #

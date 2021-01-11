@@ -1,7 +1,7 @@
 import cv2
 
 # Open the device at the ID 2
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(0)
 
 #Check whether user selected camera is opened successfully.
 if not cap.isOpened():

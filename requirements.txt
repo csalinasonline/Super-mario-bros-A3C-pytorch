@@ -34,6 +34,8 @@ opencv-python==4.5.1.48
 osrf-pycommon==0.1.9
 Pillow==7.2.0
 pyglet==1.5.0
+pyserial==3.5
+pyserial-asyncio==0.5
 quality-of-service-demo-py==0.7.9
 ros2action==0.7.11
 ros2cli==0.7.11

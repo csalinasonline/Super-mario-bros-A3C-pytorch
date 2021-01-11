@@ -81,6 +81,14 @@ def goto_main_menu():
 def goto_lvl_1_1():
     pass
 
+# method capture state
+def capture_state():
+    pass
+
+# method reduce state
+def reduce_state():
+    pass
+
 #
 def test(opt):
     # setup serial

@@ -280,7 +280,9 @@ void loop() {
           action_output(NES_CTRL_START);
           action_clear(NES_CTRL_SELECT);
           action_clear(NES_IO_POWER);
-          action_clear(NES_IO_RESET);                                        
+          action_clear(NES_IO_RESET);  
+          delay(200); 
+          action_clear(NES_CTRL_START);                                     
           break;
         case ACTION_14: // ['select']
           action_clear(NES_CTRL_UP);
@@ -292,7 +294,9 @@ void loop() {
           action_clear(NES_CTRL_START);
           action_output(NES_CTRL_SELECT);
           action_clear(NES_IO_POWER);
-          action_clear(NES_IO_RESET);                                        
+          action_clear(NES_IO_RESET);   
+          delay(200); 
+          action_clear(NES_CTRL_SELECT);                                       
           break;
         case ACTION_15: // ['power']
           action_clear(NES_CTRL_UP);
@@ -316,7 +320,7 @@ void loop() {
           action_clear(NES_CTRL_START);
           action_output(NES_CTRL_SELECT);
           action_clear(NES_IO_POWER);
-          action_output(NES_IO_RESET);                                        
+          action_output(NES_IO_RESET);   
           delay(2000);    
           action_clear(NES_CTRL_START);
           action_clear(NES_CTRL_SELECT);                                           

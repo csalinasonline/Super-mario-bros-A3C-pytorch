@@ -3,3 +3,5 @@
 *.jpg
 
 pic/
+output/
+src/__pycache__/

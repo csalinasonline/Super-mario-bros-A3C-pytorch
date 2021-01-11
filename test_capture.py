@@ -27,24 +27,24 @@ def get_args():
     return args
 
 def convert_state_to_img(input_state):
-    print(input_state.shape)
+    #print(input_state.shape)
     state_2 = np.squeeze(input_state)
-    print(state_2.shape)
+    #print(state_2.shape)
     state_3 = state_2[1,:,:]
-    print(state_3.shape)
+    #print(state_3.shape)
     state_4 = np.array(state_3)
-    print(state_4.shape)
-    time.sleep(2)
-    print(state_4)
-    time.sleep(2)
+    #print(state_4.shape)
+    #time.sleep(2)
+    #print(state_4)
+    #time.sleep(2)
     state_5 = state_4 * 255.
-    print(state_5)
-    time.sleep(2)
+    #print(state_5)
+    #time.sleep(2)
     state_6 = cv2.cvtColor(state_5, cv2.COLOR_GRAY2RGB)
-    print(state_6.shape)
-    time.sleep(2)
+    #print(state_6.shape)
+    #time.sleep(2)
     cv2.imshow('Start Img',state_6)
-    time.sleep(2)
+    #time.sleep(2)
 
 def test(opt):
     # setup serial

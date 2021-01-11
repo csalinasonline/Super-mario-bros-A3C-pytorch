@@ -94,7 +94,7 @@ class CustomReward(Wrapper):
         # 0-1.0
         # print(frame3/255)
         #
-        #print(info)
+        print(info)
         #print(done)
         #print(reward)
         #

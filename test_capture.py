@@ -184,13 +184,12 @@ def test(opt):
 
     # get inital state from start of Mario Stage via Image
     st = env.reset()
-    print(st.shape)
-    print(type(st))
+    #print(st.shape)
+    #print(type(st))
     # [1,4,84,84]
-    state = torch.from_numpy(st)
-    print(state.shape)
-    print(type(state))
-    # torch[1,4,84,84]
+    #state = torch.from_numpy(st)
+    #print(state.shape)
+    #print(type(state))
     #convert_state_to_img(state)
 
     # MODIFIED
@@ -207,8 +206,6 @@ def test(opt):
         # capture nes frame-by-frame
         ret, frame = cap.read()
         # convert nes frame to input feature
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        #
         frame_2 = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
         #
         frame_3 = frame_2[20:476, 128:512]
@@ -219,10 +216,23 @@ def test(opt):
         #
         st = frame_5
         a[0,i,...] = st
-    #    print(f'{i}:{a.shape}')
+        print(f'{i}:{a.shape}')
+
+    a = torch.from_numpy(a)
+    a = a.float()
+    #a2 = np.squeeze(a)
+    #print(state_2.shape)
+    #a3 = a2[0:3,:,:].permute(1, 2, 0)
+    #a4 = a3 * 255.
+    #print(state_3.shape)
+    #cv2.imshow('Input State to Img', np.array(a3, dtype = np.uint8 ))
+    
+    state = a
+
+    #convert_state_to_img(a)
     #
     #state = a
-
+    #time.sleep(2)
     #os._exit(os.EX_OK)
 
     #

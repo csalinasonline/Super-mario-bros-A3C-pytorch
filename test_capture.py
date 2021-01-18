@@ -141,16 +141,20 @@ def test(opt):
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
+    # load template - detect flag pole
+    template = cv2.imread('Template.png',0)
+    w, h = template.shape[::-1]
+
     # setup nes to main menu if not already (assume already console turned on)
-    print(f'Reseting Nes to main menu')
-    nes_button(ser, nes.NES_RESET)
-    time.sleep(5)
-    print(f'Start Mario Bros...')
-    nes_button(ser, nes.NES_START)
-    time.sleep(5)
-    print(f'Start Game...')
-    nes_button(ser, nes.NES_START)
-    time.sleep(5)
+#    print(f'Reseting Nes to main menu')
+#    nes_button(ser, nes.NES_RESET)
+#    time.sleep(5)
+#    print(f'Start Mario Bros...')
+#    nes_button(ser, nes.NES_START)
+#    time.sleep(5)
+#    print(f'Start Game...')
+#    nes_button(ser, nes.NES_START)
+#    time.sleep(5)
 
     # seed
     torch.manual_seed(123)
@@ -241,6 +245,12 @@ def test(opt):
         #
         frame_4 = cv2.resize(frame_3, (CONST_NES_RES_WIDTH, CONST_NES_RES_HEIGHT))
         #
+        img = frame_4.copy()
+        # Apply template Matching
+        res = cv2.matchTemplate(img,template,5)
+        threshold = 0.75
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        #
         frame_5 = cv2.resize(frame_4, (CONST_FEATURE_RES_WIDTH, CONST_FEATURE_RES_HEIGHT))
 
         # display nes frame as feature
@@ -252,7 +262,7 @@ def test(opt):
         # show game
         env.render()
         # give some delay
-        time.sleep(1)
+        #time.sleep(1)
         # MODIFIED
 
         # finsihed level
@@ -263,6 +273,9 @@ def test(opt):
         #f_goal = is_flag_goal()
         #if f_goal:
         #    break
+        if max_val > threshold:
+            break
+        #
 
         # cv2 waits for a user input to quit the application
         if cv2.waitKey(1) & 0xFF == ord('q'):

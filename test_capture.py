@@ -207,7 +207,7 @@ def test(opt):
     #convert_state_to_img(state)
 
     N = 4
-    offset = 10
+    offset = 20
     img_2 = np.zeros((84,84))
 
     # get 4 frames
@@ -226,7 +226,7 @@ def test(opt):
         #
         frame_5 = cv2.resize(frame_4, (CONST_FEATURE_RES_WIDTH, CONST_FEATURE_RES_HEIGHT))
         #
-        frame_5 = cv2.subtract(frame_5, b)
+        frame_5 = cv2.add(frame_5, b)
         st = frame_5
         img_2 = frame_5
         cv2.imwrite('nes_img_1.png', frame_5)
@@ -318,7 +318,7 @@ def test(opt):
             #
             frame_5 = cv2.resize(frame_4, (CONST_FEATURE_RES_WIDTH, CONST_FEATURE_RES_HEIGHT))
             #
-            frame_5 = cv2.subtract(frame_5, b)
+            frame_5 = cv2.add(frame_5, b)
             #
             st = frame_5
             a[0,i,...] = st

@@ -49,6 +49,9 @@ def convert_state_to_img(input_state):
     state_4 = state_3 * 255.
     #print(state_3.shape)
     cv2.imshow('Input State to Img', np.array(state_4, dtype = np.uint8 ))
+    cv2.imwrite('sim_img_1.png', np.array(state_4, dtype = np.uint8 ))
+    state_5 = np.squeeze(np.array(state_4[:,:,0,None], dtype = np.uint8 ))
+    return state_5
 
 # method that reads the score from capture
 def read_score():
@@ -187,10 +190,13 @@ def test(opt):
     #print(st.shape)
     #print(type(st))
     # [1,4,84,84]
-    #state = torch.from_numpy(st)
+    state2 = torch.from_numpy(st)
     #print(state.shape)
     #print(type(state))
-    #convert_state_to_img(state)
+    img_1 = convert_state_to_img(state2)
+    print(img_1)
+    print(img_1.shape)
+    time.sleep(2)
 
     # MODIFIED
     ser.write('\n'.encode('utf_8'))
@@ -201,9 +207,13 @@ def test(opt):
     #convert_state_to_img(state)
 
     N = 4
+    offset = 0
+    img_2 = np.zeros((84,84))
 
     # get 4 frames
     a = np.zeros((1,N,84,84))
+    b = np.ones((84,84), dtype = np.uint8)
+    b[:] = (offset)
     for i in range(N):
         # capture nes frame-by-frame
         ret, frame = cap.read()
@@ -216,12 +226,24 @@ def test(opt):
         #
         frame_5 = cv2.resize(frame_4, (CONST_FEATURE_RES_WIDTH, CONST_FEATURE_RES_HEIGHT))
         #
+        frame_5 = cv2.subtract(frame_5, b)
         st = frame_5
+        img_2 = frame_5
+        cv2.imwrite('nes_img_1.png', frame_5)
         a[0,i,...] = st
         print(f'{i}:{a.shape}')
 
+    print(img_2)
+    print(img_2.shape)
+    time.sleep(2)        
+
     a = torch.from_numpy(a)
     a = a.float()
+
+    img_2 = torch.from_numpy(img_2)
+    img_2 = img_2.float()
+
+
 
     #a2 = np.squeeze(a)
     #print(state_2.shape)
@@ -261,7 +283,7 @@ def test(opt):
         msg = str(action + 1) + '\n'
         msg = msg.encode('utf_8')
         ser.write(msg)
-        #print('{0:02}'.format(action) + ':' + '{0:08b}'.format(action) + ':' + str(COMPLEX_MOVEMENT[action]))
+        print('{0:02}'.format(action) + ':' + '{0:08b}'.format(action) + ':' + str(COMPLEX_MOVEMENT[action]))
 
         # update state
         #state, reward, done, info = env.step(action)
@@ -295,6 +317,8 @@ def test(opt):
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
             #
             frame_5 = cv2.resize(frame_4, (CONST_FEATURE_RES_WIDTH, CONST_FEATURE_RES_HEIGHT))
+            #
+            frame_5 = cv2.subtract(frame_5, b)
             #
             st = frame_5
             a[0,i,...] = st

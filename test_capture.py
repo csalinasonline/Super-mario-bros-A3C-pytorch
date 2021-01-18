@@ -10,6 +10,8 @@ os.environ['OMP_NUM_THREADS'] = '1'
 import argparse
 import torch
 import numpy as np
+import NesInterface as nes
+from NesInterface import nes_button
 from src.env import create_train_env
 from src.model import ActorCritic
 import torch.nn.functional as F
@@ -118,6 +120,17 @@ def test(opt):
       ser.open()
       time.sleep(1)
 
+    # setup nes to main menu if not already (assume already console turned on)
+    print(f'Reseting Nes to main menu')
+    nes_button(ser, nes.NES_RESET)
+    time.sleep(5)
+    print(f'Start Mario Bros...')
+    nes_button(ser, nes.NES_START)
+    time.sleep(5)
+    print(f'Start Game...')
+    nes_button(ser, nes.NES_START)
+    time.sleep(5)
+
     # seed
     torch.manual_seed(123)
 
@@ -181,7 +194,7 @@ def test(opt):
         # send action to arduino nes controller
         msg = str(action + 1) + '\n'
         msg = msg.encode('utf_8')
-        ser.write(msg)
+        #ser.write(msg)
         print('{0:02}'.format(action) + ':' + '{0:08b}'.format(action) + ':' + str(COMPLEX_MOVEMENT[action]))
 
         # update state

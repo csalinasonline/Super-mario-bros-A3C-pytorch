@@ -17,6 +17,16 @@ from src.model import ActorCritic
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT, COMPLEX_MOVEMENT, RIGHT_ONLY
+
+CONST_CAP_RES_WIDTH = 640
+CONST_CAP_RES_HEIGHT = 480
+CONST_NES_RES_WIDTH = 256
+CONST_NES_RES_HEIGHT = 240
+CONST_OFFSET_RES_WIDTH = (20, 476)
+CONST_OFFSET_RES_HEIGHT = (128, 512)
+CONST_FEATURE_RES_WIDTH = 84
+CONST_FEATURE_RES_HEIGHT = 84
+
 #
 def get_args():
     parser = argparse.ArgumentParser(
@@ -216,10 +226,25 @@ def test(opt):
         #state, reward, done, info = capture_step()
         #state = torch.from_numpy(state)
 
-        # capture frame-by-frame
+        # capture nes frame-by-frame
         ret, frame = cap.read()
         # display the resulting frame
-        cv2.imshow('preview', frame)
+        cv2.imshow('nes full preview', frame)
+
+        # convert nes frame to input feature
+        #
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        #
+        frame_2 = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+        #
+        frame_3 = frame_2[20:476, 128:512]
+        #
+        frame_4 = cv2.resize(frame_3, (CONST_NES_RES_WIDTH, CONST_NES_RES_HEIGHT))
+        #
+        frame_5 = cv2.resize(frame_4, (CONST_FEATURE_RES_WIDTH, CONST_FEATURE_RES_HEIGHT))
+
+        # display nes frame as feature
+        cv2.imshow('nes feature preview', frame_5)
 
         # show state as img
         convert_state_to_img(state)

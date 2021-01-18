@@ -120,6 +120,17 @@ def test(opt):
       ser.open()
       time.sleep(1)
 
+    # open vid capture device
+    cap = cv2.VideoCapture(0)
+
+    # Check whether user selected camera is opened successfully.
+    if not cap.isOpened():
+      print("Could not open video device")
+
+    # to set the resolution
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
     # setup nes to main menu if not already (assume already console turned on)
     print(f'Reseting Nes to main menu')
     nes_button(ser, nes.NES_RESET)
@@ -205,6 +216,11 @@ def test(opt):
         #state, reward, done, info = capture_step()
         #state = torch.from_numpy(state)
 
+        # capture frame-by-frame
+        ret, frame = cap.read()
+        # display the resulting frame
+        cv2.imshow('preview', frame)
+
         # show state as img
         convert_state_to_img(state)
 
@@ -233,6 +249,8 @@ def test(opt):
     ser.close()
     # close cv2
     cv2.destroyAllWindows()
+    # release the capture
+    cap.release()
 
 if __name__ == "__main__":
     opt = get_args()

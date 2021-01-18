@@ -1,7 +1,3 @@
-
-
-
-
 """
 @author: Viet Nguyen <nhviet1009@gmail.com>
 """
@@ -39,6 +35,11 @@ class Monitor:
 
         try:
             os.mkdir(dir_path_str + '/pic/gray')
+        except:
+            pass
+
+        try:
+            os.mkdir(dir_path_str + '/pic/detect')
         except:
             pass
 
@@ -87,6 +88,20 @@ class CustomReward(Wrapper):
         frame2 = cv2.cvtColor(state, cv2.COLOR_BGR2GRAY)
         file_str = dir_path_str + '/pic/gray/' + 'IMG_' + str(self.counter) + '.png'
         cv2.imwrite(file_str, frame2)
+        # detect flag pole
+        template = cv2.imread('Template.png',0)
+        w, h = template.shape[::-1]
+        img = frame2.copy()
+        # Apply template Matching
+        res = cv2.matchTemplate(img,template,5)
+        threshold = 0.75
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        if max_val > threshold:
+            top_left = min_loc
+            bottom_right = (top_left[0] + w, top_left[1] + h)
+            cv2.rectangle(img,top_left, bottom_right, 255, 2)
+        file_str = dir_path_str + '/pic/detect/' + 'IMG_' + str(self.counter) + '.png'
+        cv2.imwrite(file_str, img)
         #
         frame3 = cv2.resize(frame2, (84, 84))
         file_str = dir_path_str + '/pic/resize/' + 'IMG_' + str(self.counter) + '.png'

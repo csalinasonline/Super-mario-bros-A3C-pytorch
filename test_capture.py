@@ -1,3 +1,4 @@
+
 """
 @author: Conrad Salinas <csalinasonline@gmail.com>
 """
@@ -146,15 +147,15 @@ def test(opt):
     w, h = template.shape[::-1]
 
     # setup nes to main menu if not already (assume already console turned on)
-#    print(f'Reseting Nes to main menu')
-#    nes_button(ser, nes.NES_RESET)
-#    time.sleep(5)
-#    print(f'Start Mario Bros...')
-#    nes_button(ser, nes.NES_START)
-#    time.sleep(5)
-#    print(f'Start Game...')
-#    nes_button(ser, nes.NES_START)
-#    time.sleep(5)
+    print(f'Reseting Nes to main menu')
+    nes_button(ser, nes.NES_RESET)
+    time.sleep(2)
+    print(f'Start Mario Bros...')
+    nes_button(ser, nes.NES_START)
+    time.sleep(2)
+    print(f'Start Game...')
+    nes_button(ser, nes.NES_START)
+    time.sleep(2)
 
     # seed
     torch.manual_seed(123)
@@ -182,8 +183,16 @@ def test(opt):
     model.eval()
 
     # get inital state from start of Mario Stage via Image
-    state = torch.from_numpy(env.reset())
-    convert_state_to_img(state)
+    st = env.reset()
+    print(st.shape)
+    print(type(st))
+    # [1,4,84,84]
+    state = torch.from_numpy(st)
+    print(state.shape)
+    print(type(state))
+    # torch[1,4,84,84]
+    #convert_state_to_img(state)
+
     # MODIFIED
     ser.write('\n'.encode('utf_8'))
     capture_reset()
@@ -191,6 +200,41 @@ def test(opt):
     #state = reduce_state()
     #state = torch.from_numpy(state)
     #convert_state_to_img(state)
+
+    # get 4 frames
+    a = np.zeros((1,4,84,84))
+    for i in range(4):
+        # capture nes frame-by-frame
+        ret, frame = cap.read()
+        # convert nes frame to input feature
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        #
+        frame_2 = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+        #
+        frame_3 = frame_2[20:476, 128:512]
+        #
+        frame_4 = cv2.resize(frame_3, (CONST_NES_RES_WIDTH, CONST_NES_RES_HEIGHT))
+        #
+        frame_5 = cv2.resize(frame_4, (CONST_FEATURE_RES_WIDTH, CONST_FEATURE_RES_HEIGHT))
+        #
+        st = frame_5
+        a[0,i,...] = st
+    #    print(f'{i}:{a.shape}')
+    #
+    #state = a
+
+    #os._exit(os.EX_OK)
+
+    #
+    #state = torch.from_numpy(state)
+    #convert_state_to_img(state)
+
+    #os._exit(os.EX_OK)
+
+    # display nes frame as feature
+    #cv2.imshow('nes feature preview', frame_5) 
+    #print('Showing  1st nes frame')
+    #time.sleep(5)
 
     done = True
 
@@ -200,7 +244,7 @@ def test(opt):
         if done:
             h_0 = torch.zeros((1, 512), dtype=torch.float)
             c_0 = torch.zeros((1, 512), dtype=torch.float)
-            env.reset()
+            #env.reset()
         else:
             h_0 = h_0.detach()
             c_0 = c_0.detach()
@@ -219,7 +263,7 @@ def test(opt):
         # send action to arduino nes controller
         msg = str(action + 1) + '\n'
         msg = msg.encode('utf_8')
-        #ser.write(msg)
+        ser.write(msg)
         print('{0:02}'.format(action) + ':' + '{0:08b}'.format(action) + ':' + str(COMPLEX_MOVEMENT[action]))
 
         # update state
@@ -248,16 +292,21 @@ def test(opt):
         img = frame_4.copy()
         # Apply template Matching
         res = cv2.matchTemplate(img,template,5)
-        threshold = 0.75
+        threshold = 0.90
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
         #
         frame_5 = cv2.resize(frame_4, (CONST_FEATURE_RES_WIDTH, CONST_FEATURE_RES_HEIGHT))
+        #
+        #state = frame_5
+
+        # numpy to tensor
+        #state = torch.from_numpy(state)
 
         # display nes frame as feature
-        cv2.imshow('nes feature preview', frame_5)
+        #cv2.imshow('nes feature preview', frame_5)
 
         # show state as img
-        convert_state_to_img(state)
+        #convert_state_to_img(state)
 
         # show game
         env.render()

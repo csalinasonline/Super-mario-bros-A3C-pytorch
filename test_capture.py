@@ -23,8 +23,8 @@ CONST_CAP_RES_WIDTH = 640
 CONST_CAP_RES_HEIGHT = 480
 CONST_NES_RES_WIDTH = 256
 CONST_NES_RES_HEIGHT = 240
-CONST_OFFSET_RES_WIDTH = (20, 476)
-CONST_OFFSET_RES_HEIGHT = (128, 512)
+CONST_OFFSET_RES_WIDTH = (20, 478)
+CONST_OFFSET_RES_HEIGHT = (102, 539)
 CONST_FEATURE_RES_WIDTH = 84
 CONST_FEATURE_RES_HEIGHT = 84
 
@@ -207,7 +207,7 @@ def test(opt):
     #convert_state_to_img(state)
 
     N = 4
-    offset = 0
+    offset = 10
     img_2 = np.zeros((84,84))
 
     # get 4 frames
@@ -218,9 +218,9 @@ def test(opt):
         # capture nes frame-by-frame
         ret, frame = cap.read()
         # convert nes frame to input feature
-        frame_2 = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+        frame_2 = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         #
-        frame_3 = frame_2[20:476, 128:512]
+        frame_3 = frame_2[CONST_OFFSET_RES_WIDTH[0]:CONST_OFFSET_RES_WIDTH[1], CONST_OFFSET_RES_HEIGHT[0]:CONST_OFFSET_RES_HEIGHT[1]]
         #
         frame_4 = cv2.resize(frame_3, (CONST_NES_RES_WIDTH, CONST_NES_RES_HEIGHT))
         #
@@ -304,9 +304,9 @@ def test(opt):
             cv2.imshow('nes full preview', frame)
 
             # convert # frame to input feature
-            frame_2 = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+            frame_2 = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) #RGB, BGR, GBR, GRB
             #
-            frame_3 = frame_2[20:476, 128:512]
+            frame_3 = frame_2[CONST_OFFSET_RES_WIDTH[0]:CONST_OFFSET_RES_WIDTH[1], CONST_OFFSET_RES_HEIGHT[0]:CONST_OFFSET_RES_HEIGHT[1]]
             #
             frame_4 = cv2.resize(frame_3, (CONST_NES_RES_WIDTH, CONST_NES_RES_HEIGHT))
             #

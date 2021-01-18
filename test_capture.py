@@ -200,9 +200,11 @@ def test(opt):
     #state = torch.from_numpy(state)
     #convert_state_to_img(state)
 
+    N = 4
+
     # get 4 frames
-    a = np.zeros((1,4,84,84))
-    for i in range(4):
+    a = np.zeros((1,N,84,84))
+    for i in range(N):
         # capture nes frame-by-frame
         ret, frame = cap.read()
         # convert nes frame to input feature
@@ -220,31 +222,16 @@ def test(opt):
 
     a = torch.from_numpy(a)
     a = a.float()
+
     #a2 = np.squeeze(a)
     #print(state_2.shape)
     #a3 = a2[0:3,:,:].permute(1, 2, 0)
     #a4 = a3 * 255.
     #print(state_3.shape)
     #cv2.imshow('Input State to Img', np.array(a3, dtype = np.uint8 ))
-    
-    state = a
-
-    #convert_state_to_img(a)
-    #
-    #state = a
-    #time.sleep(2)
-    #os._exit(os.EX_OK)
-
-    #
-    #state = torch.from_numpy(state)
-    #convert_state_to_img(state)
-
-    #os._exit(os.EX_OK)
-
-    # display nes frame as feature
-    #cv2.imshow('nes feature preview', frame_5) 
     #print('Showing  1st nes frame')
-    #time.sleep(5)
+
+    state = a
 
     done = True
 
@@ -274,40 +261,60 @@ def test(opt):
         msg = str(action + 1) + '\n'
         msg = msg.encode('utf_8')
         ser.write(msg)
-        print('{0:02}'.format(action) + ':' + '{0:08b}'.format(action) + ':' + str(COMPLEX_MOVEMENT[action]))
+        #print('{0:02}'.format(action) + ':' + '{0:08b}'.format(action) + ':' + str(COMPLEX_MOVEMENT[action]))
 
         # update state
-        state, reward, done, info = env.step(action)
+        #state, reward, done, info = env.step(action)
+        #print(st.shape)
         # numpy to tensor
-        state = torch.from_numpy(state)
+        #state = torch.from_numpy(state)
+        #print(st.shape)
         # MODIFIED
         #state, reward, done, info = capture_step()
         #state = torch.from_numpy(state)
 
-        # capture nes frame-by-frame
-        ret, frame = cap.read()
-        # display the resulting frame
-        cv2.imshow('nes full preview', frame)
+        # get 4 frames
+        a = np.zeros((1,N,84,84))
+        for i in range(N):
+            # capture nes frame-by-frame
+            ret, frame = cap.read()
+            # display the resulting frame
+            cv2.imshow('nes full preview', frame)
 
-        # convert nes frame to input feature
+            # convert # frame to input feature
+            frame_2 = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+            #
+            frame_3 = frame_2[20:476, 128:512]
+            #
+            frame_4 = cv2.resize(frame_3, (CONST_NES_RES_WIDTH, CONST_NES_RES_HEIGHT))
+            #
+            img = frame_4.copy()
+            # Apply template Matching
+            res = cv2.matchTemplate(img,template,5)
+            threshold = 0.90
+            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+            #
+            frame_5 = cv2.resize(frame_4, (CONST_FEATURE_RES_WIDTH, CONST_FEATURE_RES_HEIGHT))
+            #
+            st = frame_5
+            a[0,i,...] = st
+            #print(f'{i}:{a.shape}')
+
+        a = torch.from_numpy(a)
+        a = a.float()
+
+        #print(frame_5.shape)
+        #time.sleep(10)
         #
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        #
-        frame_2 = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
-        #
-        frame_3 = frame_2[20:476, 128:512]
-        #
-        frame_4 = cv2.resize(frame_3, (CONST_NES_RES_WIDTH, CONST_NES_RES_HEIGHT))
-        #
-        img = frame_4.copy()
-        # Apply template Matching
-        res = cv2.matchTemplate(img,template,5)
-        threshold = 0.90
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-        #
-        frame_5 = cv2.resize(frame_4, (CONST_FEATURE_RES_WIDTH, CONST_FEATURE_RES_HEIGHT))
-        #
-        #state = frame_5
+        state = a
+
+        #a2 = np.squeeze(a)
+        #print(state_2.shape)
+        #a3 = a2[0:3,:,:].permute(1, 2, 0)
+        #a4 = a3 * 255.
+        #print(state_3.shape)
+        #cv2.imshow('Input State to Img', np.array(a3, dtype = np.uint8 ))
+        #print('Showing  1st nes frame')
 
         # numpy to tensor
         #state = torch.from_numpy(state)
@@ -319,15 +326,15 @@ def test(opt):
         #convert_state_to_img(state)
 
         # show game
-        env.render()
+        #env.render()
         # give some delay
         #time.sleep(1)
         # MODIFIED
 
         # finsihed level
-        if info["flag_get"]:
+        #if info["flag_get"]:
             #print("World {} stage {} completed".format(opt.world, opt.stage))
-            break
+        #    break
         # MODIFIED
         #f_goal = is_flag_goal()
         #if f_goal:

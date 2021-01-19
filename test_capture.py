@@ -216,7 +216,7 @@ def test(opt):
     # setup serial
     ser = serial.Serial(
       port='/dev/ttyACM0',
-      baudrate=9600,
+      baudrate=115200,
       parity=serial.PARITY_ODD,
       stopbits=serial.STOPBITS_TWO,
       bytesize=serial.SEVENBITS
@@ -317,7 +317,7 @@ def test(opt):
         # capture nes frame-by-frame
         ret, frame = cap.read()
         # convert nes frame to input feature
-        frame_2 = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        frame_2 = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
         #
         frame_3 = frame_2[CONST_OFFSET_RES_WIDTH[0]:CONST_OFFSET_RES_WIDTH[1], CONST_OFFSET_RES_HEIGHT[0]:CONST_OFFSET_RES_HEIGHT[1]]
         #
@@ -412,7 +412,7 @@ def test(opt):
             cv2.imshow('nes full preview', frame)
 
             # convert # frame to input feature
-            frame_2 = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) #RGB, BGR, GBR, GRB
+            frame_2 = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY) #RGB, BGR, GBR, GRB
             #
             frame_3 = frame_2[CONST_OFFSET_RES_WIDTH[0]:CONST_OFFSET_RES_WIDTH[1], CONST_OFFSET_RES_HEIGHT[0]:CONST_OFFSET_RES_HEIGHT[1]]
             #

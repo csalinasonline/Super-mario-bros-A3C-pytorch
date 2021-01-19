@@ -207,12 +207,13 @@ def test(opt):
     #convert_state_to_img(state)
 
     N = 4
-    offset = 20
+    offset = 15
     img_2 = np.zeros((84,84))
 
     # get 4 frames
     a = np.zeros((1,N,84,84))
-    b = np.ones((84,84), dtype = np.uint8)
+    b = np.zeros((84,84), dtype = np.uint8)
+    c = np.zeros((473, 437), dtype = np.uint8)
     b[:] = (offset)
     for i in range(N):
         # capture nes frame-by-frame
@@ -222,7 +223,11 @@ def test(opt):
         #
         frame_3 = frame_2[CONST_OFFSET_RES_WIDTH[0]:CONST_OFFSET_RES_WIDTH[1], CONST_OFFSET_RES_HEIGHT[0]:CONST_OFFSET_RES_HEIGHT[1]]
         #
-        frame_4 = cv2.resize(frame_3, (CONST_NES_RES_WIDTH, CONST_NES_RES_HEIGHT))
+        c[0:15] = (157)
+        c[15:473:,:] = frame_3
+        #print(frame_3.shape)
+        #
+        frame_4 = cv2.resize(c, (CONST_NES_RES_WIDTH, CONST_NES_RES_HEIGHT))
         #
         frame_5 = cv2.resize(frame_4, (CONST_FEATURE_RES_WIDTH, CONST_FEATURE_RES_HEIGHT))
         #
@@ -235,7 +240,7 @@ def test(opt):
 
     print(img_2)
     print(img_2.shape)
-    time.sleep(2)        
+    time.sleep(2)
 
     a = torch.from_numpy(a)
     a = a.float()
@@ -308,6 +313,10 @@ def test(opt):
             #
             frame_3 = frame_2[CONST_OFFSET_RES_WIDTH[0]:CONST_OFFSET_RES_WIDTH[1], CONST_OFFSET_RES_HEIGHT[0]:CONST_OFFSET_RES_HEIGHT[1]]
             #
+            #c[0:15] = (157)
+            #c[15:473:,:] = frame_3
+            #print(frame_3.shape)     
+            #       
             frame_4 = cv2.resize(frame_3, (CONST_NES_RES_WIDTH, CONST_NES_RES_HEIGHT))
             #
             img = frame_4.copy()

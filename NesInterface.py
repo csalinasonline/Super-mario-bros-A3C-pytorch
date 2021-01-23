@@ -5,6 +5,7 @@
 
 #  Notes:
 #  NES Controller action mapping
+#  COMPLEX
 #  1 [['NOOP'],
 #  2 ['right'],
 #  3 ['right', 'A'],
@@ -23,6 +24,15 @@
 #  NES Classic IO mapping
 #  15 [['power'],
 #  16 ['reset']
+#  SIMPLE
+#  1  ['NOOP'],
+#  2  ['right'],
+#  3  ['right', 'A'],
+#  4  ['right', 'B'],
+#  5  ['right', 'A', 'B'],
+#  6  ['A'],
+#  7  ['left'],
+
 
 NES_NOOP = 1
 NES_RIGHT = 2

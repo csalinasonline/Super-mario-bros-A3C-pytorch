@@ -12,9 +12,11 @@ import argparse
 import torch
 import numpy as np
 import NesInterface as nes
+from threading import Thread
 from NesInterface import nes_button
 from src.env import create_train_env
 from src.model import ActorCritic
+from queue import Queue
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT, COMPLEX_MOVEMENT, RIGHT_ONLY
@@ -29,6 +31,57 @@ CONST_OFFSET_RES_HEIGHT = (102, 539)
 CONST_FEATURE_RES_WIDTH = CONST_DIM
 CONST_FEATURE_RES_HEIGHT = CONST_DIM
 
+class FileVideoStream:
+    def __init__(self, path, queueSize=128):
+        # initialize the file video stream along with the boolean
+        # used to indicate if the thread should be stopped or not
+        self.stream = cv2.VideoCapture(path)
+        self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, 480) 
+        if not self.stream.isOpened():
+            print("Could not open video device")
+        self.stopped = False
+        # initialize the queue used to store frames read from
+        # the video file
+        self.Q = Queue(maxsize=queueSize)
+
+    def start(self):
+        # start a thread to read frames from the file video stream
+        t = Thread(target=self.update, args=())
+        t.daemon = True
+        t.start()
+        return self
+
+    def update(self):
+        # keep looping infinitely
+        while True:
+            # if the thread indicator variable is set, stop the
+            # thread
+            if self.stopped:
+                return
+            # otherwise, ensure the queue has room in it
+            if not self.Q.full():
+                # read the next frame from the file
+                (grabbed, frame) = self.stream.read()
+                # if the `grabbed` boolean is `False`, then we have
+                # reached the end of the video file
+                if not grabbed:
+                    self.stop()
+                    return
+                # add the frame to the queue
+                self.Q.put(frame)
+
+    def read(self):
+        # return next frame in the queue
+        return self.Q.get()
+
+    def more(self):
+        # return True if there are still frames in the queue
+        return self.Q.qsize() > 0
+
+    def stop(self):
+        # indicate that the thread should be stopped
+        self.stopped = True                                                
 
 def calculate_cdf(histogram):
     """
@@ -233,15 +286,17 @@ def test(opt):
       time.sleep(1)
 
     # open vid capture device
-    cap = cv2.VideoCapture(0)
+    # cap = cv2.VideoCapture(0)
+    print("Starting video file thread...")
+    fvs = FileVideoStream(0).start()
 
     # Check whether user selected camera is opened successfully.
-    if not cap.isOpened():
-      print("Could not open video device")
+    #if not cap.isOpened():
+    #  print("Could not open video device")
 
     # to set the resolution
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    #cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    #cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
     # load template - detect flag pole
     template = cv2.imread('Template.png',0)
@@ -320,7 +375,8 @@ def test(opt):
     b[:] = (offset)
     for i in range(N):
         # capture nes frame-by-frame
-        ret, frame = cap.read()
+        # ret, frame = cap.read()
+        frame = fvs.read()
         # convert nes frame to input feature
         frame_2 = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
         #
@@ -412,7 +468,9 @@ def test(opt):
         a = np.zeros((1,N,CONST_DIM,CONST_DIM))
         for i in range(N):
             # capture nes frame-by-frame
-            ret, frame = cap.read()
+            #ret, frame = cap.read()
+            while fvs.more():
+                frame = fvs.read()
             # display the resulting frame
             cv2.imshow('nes full preview', frame)
 
@@ -514,7 +572,8 @@ def test(opt):
     # close cv2
     cv2.destroyAllWindows()
     # release the capture
-    cap.release()
+    #cap.release()
+    fvs.stop()
 
 if __name__ == "__main__":
     opt = get_args()

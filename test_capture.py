@@ -216,7 +216,7 @@ def test(opt):
     # setup serial
     ser = serial.Serial(
       port='/dev/ttyACM0',
-      baudrate=115200,
+      baudrate=1000000,
       parity=serial.PARITY_ODD,
       stopbits=serial.STOPBITS_TWO,
       bytesize=serial.SEVENBITS

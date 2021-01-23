@@ -82,7 +82,7 @@ void action_clear(int);
 /* INIT */
 void setup() {
   // initialize serial:
-  Serial.begin(9600);
+  Serial.begin(1000000);
   // reserve 200 bytes for the inputString:
   inputString.reserve(200);
   // init IO

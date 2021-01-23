@@ -12,6 +12,8 @@ import os
 import numpy as np
 import subprocess as sp
 
+CONST_DIM = 84
+
 
 class Monitor:
     def __init__(self, width, height, saved_path):
@@ -56,17 +58,17 @@ def process_frame(frame):
     if frame is not None:
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         #print(frame.shape)
-        frame = cv2.resize(frame, (84, 84))[None, :, :] / 255.
+        frame = cv2.resize(frame, (CONST_DIM, CONST_DIM))[None, :, :] / 255.
         #print(frame.shape)
         return frame
     else:
-        return np.zeros((1, 84, 84))
+        return np.zeros((1, CONST_DIM, CONST_DIM))
 
 
 class CustomReward(Wrapper):
     def __init__(self, env=None, monitor=None):
         super(CustomReward, self).__init__(env)
-        self.observation_space = Box(low=0, high=255, shape=(1, 84, 84))
+        self.observation_space = Box(low=0, high=255, shape=(1, CONST_DIM, CONST_DIM))
         self.counter = 0
         self.curr_score = 0
         if monitor:
@@ -103,7 +105,7 @@ class CustomReward(Wrapper):
         file_str = dir_path_str + '/pic/detect/' + 'IMG_' + str(self.counter) + '.png'
         cv2.imwrite(file_str, img)
         #
-        frame3 = cv2.resize(frame2, (84, 84))
+        frame3 = cv2.resize(frame2, (CONST_DIM, CONST_DIM))
         file_str = dir_path_str + '/pic/resize/' + 'IMG_' + str(self.counter) + '.png'
         cv2.imwrite(file_str, frame3)
         # 0-255 
@@ -134,7 +136,7 @@ class CustomReward(Wrapper):
 class CustomSkipFrame(Wrapper):
     def __init__(self, env, skip=4):
         super(CustomSkipFrame, self).__init__(env)
-        self.observation_space = Box(low=0, high=255, shape=(4, 84, 84))
+        self.observation_space = Box(low=0, high=255, shape=(4, CONST_DIM, CONST_DIM))
         self.skip = skip
 
     def step(self, action):
@@ -168,7 +170,7 @@ def create_train_env(world, stage, action_type, output_path=None):
     elif action_type == "simple":
         actions = SIMPLE_MOVEMENT
     else:
-        actions = COMPLEX_MOVEMENT
+    actions = COMPLEX_MOVEMENT
     print(actions)
     env = JoypadSpace(env, actions)
     env = CustomReward(env, monitor)

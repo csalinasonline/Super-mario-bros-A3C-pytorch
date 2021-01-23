@@ -32,6 +32,32 @@ CONST_OFFSET_RES_HEIGHT = (102, 539)
 CONST_FEATURE_RES_WIDTH = CONST_DIM
 CONST_FEATURE_RES_HEIGHT = CONST_DIM
 
+class LoopRate:
+    def __init__(self):
+        # store the start time, end time, and total number of loop iterations
+        # that were examined between the start and end intervals
+        self._start = None
+        self._end = None
+        self._numFrames = 0
+    def start(self):
+        # start the timer
+        self._start = datetime.datetime.now()
+        return self
+    def stop(self):
+        # stop the timer
+        self._end = datetime.datetime.now()
+    def update(self):
+        # increment the total number of loop completions examined during the
+        # start and end intervals
+        self._numFrames += 1
+    def elapsed(self):
+        # return the total number of seconds between the start and
+        # end interval
+        return (self._end - self._start).total_seconds()
+    def lps(self):
+        # compute the (approximate) loop completions per second
+        return 1.0 / self.elapsed()
+
 class FPS:
     def __init__(self):
         # store the start time, end time, and total number of frames
@@ -320,6 +346,9 @@ def test(opt):
     # add fps
     fps = FPS()
 
+    # add loop rate
+    loop_rate = LoopRate()
+
     # Check whether user selected camera is opened successfully.
     #if not cap.isOpened():
     #  print("Could not open video device")
@@ -457,6 +486,8 @@ def test(opt):
 
     # loop
     while True:
+        #
+        loop_rate.start()
         # 1st iter
         if done:
             h_0 = torch.zeros((1, 512), dtype=torch.float)
@@ -539,7 +570,7 @@ def test(opt):
             # update the FPS counter
             fps.stop()
             fps.update()
-            print(fps.fps())
+            print(f'FPS: {fps.fps()}')
 
         a = torch.from_numpy(a)
         a = a.float()
@@ -599,6 +630,11 @@ def test(opt):
         # cv2 waits for a user input to quit the application
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+
+        #
+        loop_rate.stop()
+        loop_rate.update()
+        print(f'LoopRate: {loop_rate.lps()}')
 
     # clear nes ctrl
     ser.write('\n'.encode('utf_8'))

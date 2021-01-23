@@ -19,14 +19,15 @@ import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT, COMPLEX_MOVEMENT, RIGHT_ONLY
 
+CONST_DIM = 84
 CONST_CAP_RES_WIDTH = 640
 CONST_CAP_RES_HEIGHT = 480
 CONST_NES_RES_WIDTH = 256
 CONST_NES_RES_HEIGHT = 240
 CONST_OFFSET_RES_WIDTH = (20, 478)
 CONST_OFFSET_RES_HEIGHT = (102, 539)
-CONST_FEATURE_RES_WIDTH = 84
-CONST_FEATURE_RES_HEIGHT = 84
+CONST_FEATURE_RES_WIDTH = CONST_DIM
+CONST_FEATURE_RES_HEIGHT = CONST_DIM
 
 
 def calculate_cdf(histogram):
@@ -306,11 +307,11 @@ def test(opt):
 
     N = 4
     offset = 15
-    img_2 = np.zeros((84,84))
+    img_2 = np.zeros((CONST_DIM,CONST_DIM))
 
     # get 4 frames
-    a = np.zeros((1,N,84,84))
-    b = np.zeros((84,84), dtype = np.uint8)
+    a = np.zeros((1,N,CONST_DIM,CONST_DIM))
+    b = np.zeros((CONST_DIM,CONST_DIM), dtype = np.uint8)
     c = np.zeros((473, 437), dtype = np.uint8)
     b[:] = (offset)
     for i in range(N):
@@ -404,7 +405,7 @@ def test(opt):
         #state = torch.from_numpy(state)
 
         # get 4 frames
-        a = np.zeros((1,N,84,84))
+        a = np.zeros((1,N,CONST_DIM,CONST_DIM))
         for i in range(N):
             # capture nes frame-by-frame
             ret, frame = cap.read()

@@ -247,6 +247,10 @@ def test(opt):
     template = cv2.imread('Template.png',0)
     w, h = template.shape[::-1]
 
+    # load template - detect gameover
+    template_2 = cv2.imread('Template2.png',0)
+    w_2, h_2 = template_2.shape[::-1]
+
     # setup nes to main menu if not already (assume already console turned on)
     print(f'Reseting Nes to main menu')
     nes_button(ser, nes.NES_RESET)
@@ -428,6 +432,10 @@ def test(opt):
             res = cv2.matchTemplate(img,template,5)
             threshold = 0.90
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+            # Apply template Matching
+            res_2 = cv2.matchTemplate(img,template_2,5)
+            threshold_2 = 0.60
+            min_val_2, max_val_2, min_loc_2, max_loc_2 = cv2.minMaxLoc(res_2)
             #
             frame_5 = cv2.resize(frame_4, (CONST_FEATURE_RES_WIDTH, CONST_FEATURE_RES_HEIGHT))
             #
@@ -481,6 +489,18 @@ def test(opt):
         #    break
         if max_val > threshold:
             break
+        #
+        if max_val_2 > threshold_2:
+            # setup nes to main menu if not already (assume already console turned on)
+            print(f'Reseting Nes to main menu')
+            nes_button(ser, nes.NES_RESET)
+            time.sleep(2)
+            print(f'Start Mario Bros...')
+            nes_button(ser, nes.NES_START)
+            time.sleep(2)
+            print(f'Start Game...')
+            nes_button(ser, nes.NES_START)
+            time.sleep(2)        
         #
 
         # cv2 waits for a user input to quit the application

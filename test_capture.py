@@ -10,6 +10,7 @@ import serial
 os.environ['OMP_NUM_THREADS'] = '1'
 import argparse
 import torch
+import datetime
 import numpy as np
 import NesInterface as nes
 from threading import Thread
@@ -30,6 +31,32 @@ CONST_OFFSET_RES_WIDTH = (20, 478)
 CONST_OFFSET_RES_HEIGHT = (102, 539)
 CONST_FEATURE_RES_WIDTH = CONST_DIM
 CONST_FEATURE_RES_HEIGHT = CONST_DIM
+
+class FPS:
+    def __init__(self):
+        # store the start time, end time, and total number of frames
+        # that were examined between the start and end intervals
+        self._start = None
+        self._end = None
+        self._numFrames = 0
+    def start(self):
+        # start the timer
+        self._start = datetime.datetime.now()
+        return self
+    def stop(self):
+        # stop the timer
+        self._end = datetime.datetime.now()
+    def update(self):
+        # increment the total number of frames examined during the
+        # start and end intervals
+        self._numFrames += 1
+    def elapsed(self):
+        # return the total number of seconds between the start and
+        # end interval
+        return (self._end - self._start).total_seconds()
+    def fps(self):
+        # compute the (approximate) frames per second
+        return 1.0 / self.elapsed()
 
 class FileVideoStream:
     def __init__(self, path, queueSize=128):
@@ -290,6 +317,9 @@ def test(opt):
     print("Starting video file thread...")
     fvs = FileVideoStream(0).start()
 
+    # add fps
+    fps = FPS()
+
     # Check whether user selected camera is opened successfully.
     #if not cap.isOpened():
     #  print("Could not open video device")
@@ -398,7 +428,6 @@ def test(opt):
         a[0,i,...] = st
         print(f'{i}:{a.shape}')
 
-
     hist_lut, output_image = match_histograms(img_1b, img_2b)
     cv2.imwrite('nes_cor_img_1.png', output_image)
 
@@ -467,6 +496,8 @@ def test(opt):
         # get 4 frames
         a = np.zeros((1,N,CONST_DIM,CONST_DIM))
         for i in range(N):
+            #
+            fps.start()
             # capture nes frame-by-frame
             #ret, frame = cap.read()
             while fvs.more():
@@ -505,6 +536,10 @@ def test(opt):
             st = frame_6
             a[0,i,...] = st
             #print(f'{i}:{a.shape}')
+            # update the FPS counter
+            fps.stop()
+            fps.update()
+            print(fps.fps())
 
         a = torch.from_numpy(a)
         a = a.float()
@@ -574,6 +609,8 @@ def test(opt):
     # release the capture
     #cap.release()
     fvs.stop()
+    # stop the timer and display FPS information
+    fps.stop()    
 
 if __name__ == "__main__":
     opt = get_args()

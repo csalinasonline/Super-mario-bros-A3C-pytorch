@@ -489,30 +489,30 @@ def test(opt):
         #
         loop_rate.start()
         # 1st iter
-        # if done:
-        #     h_0 = torch.zeros((1, 512), dtype=torch.float)
-        #     c_0 = torch.zeros((1, 512), dtype=torch.float)
-        #     #env.reset()
-        # else:
-        #     h_0 = h_0.detach()
-        #     c_0 = c_0.detach()
-        # if torch.cuda.is_available():
-        #     h_0 = h_0.cuda()
-        #     c_0 = c_0.cuda()
-        #     state = state.cuda()
-        # # update via model output
-        # logits, value, h_0, c_0 = model(state, h_0, c_0)
+        if done:
+            h_0 = torch.zeros((1, 512), dtype=torch.float)
+            c_0 = torch.zeros((1, 512), dtype=torch.float)
+            #env.reset()
+        else:
+            h_0 = h_0.detach()
+            c_0 = c_0.detach()
+        if torch.cuda.is_available():
+            h_0 = h_0.cuda()
+            c_0 = c_0.cuda()
+            state = state.cuda()
+        # update via model output
+        logits, value, h_0, c_0 = model(state, h_0, c_0)
 
-        # # get policy and action
-        # policy = F.softmax(logits, dim=1)
-        # action = torch.argmax(policy).item()
-        # action = int(action)
+        # get policy and action
+        policy = F.softmax(logits, dim=1)
+        action = torch.argmax(policy).item()
+        action = int(action)
 
         # send action to arduino nes controller
-        #msg = str(action + 1) + '\n'
-        #msg = msg.encode('utf_8')
-        #ser.write(msg)
-        #print('{0:02}'.format(action) + ':' + '{0:08b}'.format(action) + ':' + str(COMPLEX_MOVEMENT[action]))
+        msg = str(action + 1) + '\n'
+        msg = msg.encode('utf_8')
+        ser.write(msg)
+        print('{0:02}'.format(action) + ':' + '{0:08b}'.format(action) + ':' + str(COMPLEX_MOVEMENT[action]))
 
         # update state
         #state, reward, done, info = env.step(action)
@@ -525,60 +525,60 @@ def test(opt):
         #state = torch.from_numpy(state)
 
         # get 4 frames
-        # a = np.zeros((1,N,CONST_DIM,CONST_DIM))
-        # for i in range(N):
-        #     #
-        #     fps.start()
-        #     # capture nes frame-by-frame
-        #     #ret, frame = cap.read()
-        #     while fvs.more():
-        #         frame = fvs.read()
-        #     # display the resulting frame
-        #     cv2.imshow('nes full preview', frame)
+        a = np.zeros((1,N,CONST_DIM,CONST_DIM))
+        for i in range(N):
+            #
+            fps.start()
+            # capture nes frame-by-frame
+            #ret, frame = cap.read()
+            while fvs.more():
+                frame = fvs.read()
+            # display the resulting frame
+            cv2.imshow('nes full preview', frame)
 
-        #     # convert # frame to input feature
-        #     frame_2 = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY) #RGB, BGR, GBR, GRB
-        #     #
-        #     frame_3 = frame_2[CONST_OFFSET_RES_WIDTH[0]:CONST_OFFSET_RES_WIDTH[1], CONST_OFFSET_RES_HEIGHT[0]:CONST_OFFSET_RES_HEIGHT[1]]
-        #     #
-        #     c[0:15] = (157)
-        #     c[15:473:,:] = frame_3
-        #     #print(frame_3.shape)     
-        #     #       
-        #     frame_4 = cv2.resize(frame_3, (CONST_NES_RES_WIDTH, CONST_NES_RES_HEIGHT))
-        #     #
-        #     img = frame_4.copy()
-        #     # Apply template Matching
-        #     res = cv2.matchTemplate(img,template,5)
-        #     threshold = 0.90
-        #     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-        #     # Apply template Matching
-        #     res_2 = cv2.matchTemplate(img,template_2,5)
-        #     threshold_2 = 0.60
-        #     min_val_2, max_val_2, min_loc_2, max_loc_2 = cv2.minMaxLoc(res_2)
-        #     #
-        #     frame_5 = cv2.resize(frame_4, (CONST_FEATURE_RES_WIDTH, CONST_FEATURE_RES_HEIGHT))
-        #     #
-        #     #frame_5 = cv2.add(frame_5, b)
-        #     #
-        #     after_transform = cv2.LUT(frame_5, hist_lut)
-        #     frame_6 = cv2.convertScaleAbs(after_transform)             
-        #     #
-        #     st = frame_6
-        #     a[0,i,...] = st
-        #     #print(f'{i}:{a.shape}')
-        #     # update the FPS counter
-        #     fps.stop()
-        #     fps.update()
-        #     print(f'FPS: {fps.fps()}')
+            # convert # frame to input feature
+            frame_2 = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY) #RGB, BGR, GBR, GRB
+            #
+            frame_3 = frame_2[CONST_OFFSET_RES_WIDTH[0]:CONST_OFFSET_RES_WIDTH[1], CONST_OFFSET_RES_HEIGHT[0]:CONST_OFFSET_RES_HEIGHT[1]]
+            #
+            c[0:15] = (157)
+            c[15:473:,:] = frame_3
+            #print(frame_3.shape)     
+            #       
+            frame_4 = cv2.resize(frame_3, (CONST_NES_RES_WIDTH, CONST_NES_RES_HEIGHT))
+            #
+            img = frame_4.copy()
+            # Apply template Matching
+            res = cv2.matchTemplate(img,template,5)
+            threshold = 0.90
+            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+            # Apply template Matching
+            res_2 = cv2.matchTemplate(img,template_2,5)
+            threshold_2 = 0.60
+            min_val_2, max_val_2, min_loc_2, max_loc_2 = cv2.minMaxLoc(res_2)
+            #
+            frame_5 = cv2.resize(frame_4, (CONST_FEATURE_RES_WIDTH, CONST_FEATURE_RES_HEIGHT))
+            #
+            #frame_5 = cv2.add(frame_5, b)
+            #
+            after_transform = cv2.LUT(frame_5, hist_lut)
+            frame_6 = cv2.convertScaleAbs(after_transform)             
+            #
+            st = frame_6
+            a[0,i,...] = st
+            #print(f'{i}:{a.shape}')
+            # update the FPS counter
+            fps.stop()
+            fps.update()
+            print(f'FPS: {fps.fps()}')
 
-        # a = torch.from_numpy(a)
-        # a = a.float()
+        a = torch.from_numpy(a)
+        a = a.float()
 
         #print(frame_5.shape)
         #time.sleep(10)
         #
-        #state = a
+        state = a
 
         #a2 = np.squeeze(a)
         #print(state_2.shape)
@@ -614,22 +614,22 @@ def test(opt):
         # if max_val > threshold:
         #     break
         #
-        # if max_val_2 > threshold_2:
-        #     # setup nes to main menu if not already (assume already console turned on)
-        #     print(f'Reseting Nes to main menu')
-        #     nes_button(ser, nes.NES_RESET)
-        #     time.sleep(2)
-        #     print(f'Start Mario Bros...')
-        #     nes_button(ser, nes.NES_START)
-        #     time.sleep(2)
-        #     print(f'Start Game...')
-        #     nes_button(ser, nes.NES_START)
-        #     time.sleep(2)        
-        #
+        if max_val_2 > threshold_2:
+            # setup nes to main menu if not already (assume already console turned on)
+            print(f'Reseting Nes to main menu')
+            nes_button(ser, nes.NES_RESET)
+            time.sleep(2)
+            print(f'Start Mario Bros...')
+            nes_button(ser, nes.NES_START)
+            time.sleep(2)
+            print(f'Start Game...')
+            nes_button(ser, nes.NES_START)
+            time.sleep(2)        
+        
 
         # cv2 waits for a user input to quit the application
-        # if cv2.waitKey(1) & 0xFF == ord('q'):
-        #     break
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
         #
         loop_rate.stop()

@@ -17,7 +17,7 @@ from threading import Thread
 from NesInterface import nes_button
 from src.env import create_train_env
 from src.model import ActorCritic
-from queue import Queue
+from queue import LifoQueue
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT, COMPLEX_MOVEMENT, RIGHT_ONLY
@@ -94,9 +94,9 @@ class FileVideoStream:
         if not self.stream.isOpened():
             print("Could not open video device")
         self.stopped = False
-        # initialize the queue used to store frames read from
+        # initialize stack to store frames read from
         # the video file
-        self.Q = Queue(maxsize=queueSize)
+        self.Stack = LifoQueue(maxsize = queueSize)
 
     def start(self):
         # start a thread to read frames from the file video stream
@@ -112,8 +112,8 @@ class FileVideoStream:
             # thread
             if self.stopped:
                 return
-            # otherwise, ensure the queue has room in it
-            if not self.Q.full():
+            # otherwise, ensure the stack has room in it
+            if not self.Stack.full():
                 # read the next frame from the file
                 (grabbed, frame) = self.stream.read()
                 # if the `grabbed` boolean is `False`, then we have
@@ -121,16 +121,16 @@ class FileVideoStream:
                 if not grabbed:
                     self.stop()
                     return
-                # add the frame to the queue
-                self.Q.put(frame)
+                # add the frame to the stack
+                self.Stack.put(frame)
 
     def read(self):
-        # return next frame in the queue
-        return self.Q.get()
+        # return next frame in the stack
+        return self.Stack.get()
 
     def more(self):
-        # return True if there are still frames in the queue
-        return self.Q.qsize() > 0
+        # return True if there are still frames in the stack
+        return self.Stack.qsize() > 0
 
     def stop(self):
         # indicate that the thread should be stopped

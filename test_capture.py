@@ -423,6 +423,7 @@ def test(opt):
     #state = torch.from_numpy(state)
     #convert_state_to_img(state)
 
+    DEVICE_FPS = 60
     N = 4
     offset = 15
     img_2 = np.zeros((CONST_DIM,CONST_DIM))
@@ -435,7 +436,8 @@ def test(opt):
     for i in range(N):
         # capture nes frame-by-frame
         # ret, frame = cap.read()
-        frame = fvs.read()
+        while fvs.more():
+            frame = fvs.read()
         # convert nes frame to input feature
         frame_2 = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
         #
@@ -568,6 +570,21 @@ def test(opt):
             a[0,i,...] = st
             #print(f'{i}:{a.shape}')
             # update the FPS counter
+            #fps.stop()
+            #fps.update()
+            #print(f'FPS: {fps.fps()}')
+
+            fps.stop()
+            fps.update()
+
+            CAPTURE_LOCK = DEVICE_FPS * N
+            CAP_DURATION_LOCK = 1 / CAPTURE_LOCK
+            time_elapsed = fps.elapsed()
+            time_diff = CAP_DURATION_LOCK - time_elapsed
+
+            if time_diff > 0:
+                time.sleep(time_diff)
+
             fps.stop()
             fps.update()
             print(f'FPS: {fps.fps()}')
@@ -634,7 +651,18 @@ def test(opt):
         #
         loop_rate.stop()
         loop_rate.update()
-        print(f'LoopRate: {loop_rate.lps()}')
+
+        FPS_LOCK = DEVICE_FPS
+        DURATION_LOCK = 1 / FPS_LOCK
+        time_elapsed = loop_rate.elapsed()
+        time_diff = DURATION_LOCK - time_elapsed
+
+        if time_diff > 0:
+            time.sleep(time_diff)
+
+        loop_rate.stop()
+        loop_rate.update()
+        print(f'Loop Rate: {loop_rate.lps()}')
 
     # clear nes ctrl
     ser.write('\n'.encode('utf_8'))

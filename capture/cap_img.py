@@ -14,7 +14,7 @@ print(f'NES Resolution: {(CONST_NES_RES_WIDTH, CONST_NES_RES_HEIGHT)}')
 print(f'Offsets 1: {(CONST_OFFSET_RES_WIDTH, CONST_OFFSET_RES_HEIGHT)}')
 
 # Open the device at the ID 2
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(0)
 
 #Check whether user selected camera is opened successfully.
 if not cap.isOpened():

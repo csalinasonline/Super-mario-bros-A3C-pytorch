@@ -170,7 +170,7 @@ def create_train_env(world, stage, action_type, output_path=None):
     elif action_type == "simple":
         actions = SIMPLE_MOVEMENT
     else:
-    actions = COMPLEX_MOVEMENT
+        actions = COMPLEX_MOVEMENT
     print(actions)
     env = JoypadSpace(env, actions)
     env = CustomReward(env, monitor)

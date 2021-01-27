@@ -324,9 +324,8 @@ def test(opt):
     ser = serial.Serial(
       port='/dev/ttyACM0',
       baudrate=1000000,
-      parity=serial.PARITY_ODD,
-      stopbits=serial.STOPBITS_TWO,
-      bytesize=serial.SEVENBITS
+      bytesize=serial.EIGHTBITS,
+      parity=serial.PARITY_NONE
     )
 
     # check if serial is open or not?
